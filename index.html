@@ -6,14 +6,14 @@
     <title>BgEraser | Smart Image Background Remover</title>
     <style>
         :root {
-            --primary-color: #2563eb;       /* Professional Royal Blue */
+            --primary-color: #2563eb;       
             --primary-hover: #1d4ed8;
-            --bg-color: #f4f7fe;            /* Clean & Comfortable Background */
+            --bg-color: #f4f7fe;            
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-sub: #475569;
             --border-color: #cbd5e1;
-            --success-color: #16a34a;       /* Green for Download/Success */
+            --success-color: #16a34a;       
             --danger-color: #dc2626;
             --accent-color: #f0f7ff;
         }
@@ -37,7 +37,6 @@
             margin: 0 auto;
         }
 
-        /* Navigation Bar */
         nav {
             display: flex;
             justify-content: space-between;
@@ -80,7 +79,6 @@
             color: var(--primary-color);
         }
 
-        /* Content Sections */
         .content-section {
             display: none;
             background: var(--card-bg);
@@ -112,7 +110,6 @@
             font-size: 1rem;
         }
 
-        /* Upload Area */
         .upload-area {
             border: 2px dashed var(--border-color);
             padding: 50px 20px;
@@ -168,7 +165,6 @@
             display: none;
         }
 
-        /* Buttons & Inputs */
         .btn {
             border: none;
             padding: 14px 28px;
@@ -211,7 +207,6 @@
             background-color: #15803d;
         }
 
-        /* Dashboard Styles */
         .form-group {
             margin-bottom: 20px;
         }
@@ -256,7 +251,6 @@
             margin-bottom: 4px;
         }
 
-        /* Process & Result States */
         .loading {
             display: none;
             text-align: center;
@@ -296,7 +290,6 @@
 <body>
 
 <div class="container">
-    <!-- Navbar Navigation -->
     <nav>
         <div class="logo">✨ BgEraser</div>
         <div class="nav-tabs">
@@ -305,7 +298,6 @@
         </div>
     </nav>
 
-    <!-- Section 1: Main Tool -->
     <section id="section-home" class="content-section active">
         <header>
             <h1>Remove Image Background</h1>
@@ -325,14 +317,12 @@
         
         <div class="loading" id="loadingText">Processing image... Please wait ⏱️</div>
 
-        <!-- Result Box -->
         <div class="result-box" id="resultBox">
             <div class="result-title">Background Removed Successfully! 🎉</div>
             <a id="downloadLink" class="btn btn-success">Download Transparent Image (PNG) ↓</a>
         </div>
     </section>
 
-    <!-- Section 2: Dashboard Settings -->
     <section id="section-dashboard" class="content-section">
         <header>
             <h1>Dashboard Settings</h1>
@@ -359,7 +349,6 @@
 </div>
 
 <script>
-    // Tab switching system
     function switchSection(sectionName) {
         document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -368,7 +357,6 @@
         document.getElementById(`tab-${sectionName}`).classList.add('active');
     }
 
-    // Display selected file name
     function onFileSelected() {
         const input = document.getElementById('imageInput');
         const display = document.getElementById('fileNameDisplay');
@@ -379,7 +367,6 @@
         }
     }
 
-    // Save dashboard settings to localStorage
     function saveDashboardSettings() {
         const keyVal = document.getElementById('apiKeyInput').value.trim();
         if(!keyVal) {
@@ -392,7 +379,6 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
     }
 
-    // Fetch the active API key
     function getActiveApiKey() {
         const localKey = localStorage.getItem('custom_removebg_key');
         if (localKey) {
@@ -401,7 +387,6 @@
         return document.getElementById('apiKeyInput').value.trim();
     }
 
-    // Process background removal via API
     async function removeBackgroundProcess() {
         const fileInput = document.getElementById('imageInput');
         const submitBtn = document.getElementById('submitBtn');
@@ -450,13 +435,12 @@
         } catch (error) {
             console.error(error);
             alert("Network error, please check your connection.");
-        } finaly {
+        } finally {
             submitBtn.disabled = false;
             loadingText.style.display = 'none';
         }
     }
 
-    // Load saved key on initialization
     window.onload = function() {
         const savedKey = localStorage.getItem('custom_removebg_key');
         if (savedKey) {
