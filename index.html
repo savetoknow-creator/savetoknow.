@@ -161,3 +161,345 @@
 
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة معالجة وتعديل الصور الاحترافية</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #06b6d4;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        /* نظام التبويب والأزرار */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background-color: #e2e8f0;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tool-section {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tool-section.active {
+            display: block;
+        }
+
+        /* أدوات التحكم المشتركة */
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            background: #f1f5f9;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: #0891b2;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #22c55e;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* لتنظيم مساحة مسح العلامة المائية */
+        .canvas-container {
+            position: relative;
+            margin: 20px auto;
+            max-width: 100%;
+            overflow: auto;
+            border: 1px solid #ccc;
+            background: #eee;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            cursor: crosshair;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>منصة تعديل الصور المتكاملة</h1>
+        <p>كل الأدوات اللي محتاجها في مكان واحد وسريع</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('compress-tool')">الضغط والتحويل</button>
+        <button class="tab-btn" onclick="switchTab('bg-tool')">إزالة الخلفية</button>
+        <button class="tab-btn" onclick="switchTab('watermark-tool')">إزالة العلامة المائية</button>
+    </div>
+
+    <div id="compress-tool" class="tool-section active">
+        <h2>1. ضغط وتحويل صيغ الصور (PNG ↔ JPG)</h2>
+        <div class="upload-zone">
+            <input type="file" id="compressInput" accept="image/*">
+            <p>اختر الصورة من جهازك للبدء</p>
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold;">الصيغة المستهدفة: </label>
+            <select id="formatSelect" style="padding: 8px; border-radius: 5px;">
+                <option value="image/jpeg">JPG / JPEG</option>
+                <option value="image/png">PNG</option>
+            </select>
+        </div>
+        <button class="btn-action" onclick="processCompression()">تنفيذ الضغط والتحويل</button>
+        <center><a id="compressDownload" class="download-btn" style="display:none;">تحميل الصورة الناتجة ↓</a></center>
+    </div>
+
+    <div id="bg-tool" class="tool-section">
+        <h2>2. إزالة خلفية الصورة الذكية</h2>
+        <p style="color: #64748b; font-size: 14px;">(ملحوظة: الخدمة تعتمد على API الخاص بـ Remove.bg)</p>
+        <div class="upload-zone">
+            <input type="file" id="bgInput" accept="image/*">
+            <p>اختر الصورة المراد تفريغها</p>
+        </div>
+        <button class="btn-action" onclick="processRemoveBG()">إزالة الخلفية الآن</button>
+        <center><a id="bgDownload" class="download-btn" style="display:none;">تحميل الصورة بدون خلفية ↓</a></center>
+    </div>
+
+    <div id="watermark-tool" class="tool-section">
+        <h2>3. مسح العلامة المائية (الفرشاة الذكية)</h2>
+        <p style="color: #64748b; font-size: 14px;">ارفع الصورة، وحدد بالماوس (الفرشاة) فوق العلامة المائية ثم اضغط مسح.</p>
+        <div class="upload-zone">
+            <input type="file" id="watermarkInput" accept="image/*" onchange="initWatermarkCanvas(this)">
+            <p>ارفع الصورة لعرضها على لوحة الرسم</p>
+        </div>
+        
+        <div class="canvas-container" id="canvasContainer" style="display:none;">
+            <canvas id="wmCanvas"></canvas>
+        </div>
+
+        <button class="btn-action" onclick="processRemoveWatermark()">مسح الجزء المحدد</button>
+        <center><a id="wmDownload" class="download-btn" style="display:none;">تحميل الصورة المنظفة ↓</a></center>
+    </div>
+</div>
+
+<script>
+    // التنقل بين التبويبات
+    function switchTab(toolId) {
+        document.querySelectorAll('.tool-section').forEach(section => section.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(toolId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // --- كود أداة 1: الضغط والتحويل ---
+    async function processCompression() {
+        const file = document.getElementById('compressInput').files[0];
+        const format = document.getElementById('formatSelect').value;
+        const downloadBtn = document.getElementById('compressDownload');
+
+        if (!file) return alert("اختار صورة الأول يا صاحبي!");
+
+        const options = {
+            maxSizeMB: 1, 
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: format
+        };
+
+        try {
+            const compressedFile = await imageCompression(file, options);
+            const url = URL.createObjectURL(compressedFile);
+            downloadBtn.href = url;
+            downloadBtn.download = `converted_${Date.now()}.${format === 'image/png' ? 'png' : 'jpg'}`;
+            downloadBtn.style.display = 'inline-block';
+        } catch (e) { alert("حصل خطأ أثناء الضغط!"); }
+    }
+
+    // --- كود أداة 2: إزالة الخلفية ---
+    async function processRemoveBG() {
+        const file = document.getElementById('bgInput').files[0];
+        const downloadBtn = document.getElementById('bgDownload');
+        if (!file) return alert("اختار صورة الأول!");
+
+        // ⚠️ استبدل النص بالـ API Key الخاص بك من موقع remove.bg
+        const apiKey = "YOUR_REMOVE_BG_API_KEY"; 
+
+        if(apiKey === "YOUR_REMOVE_BG_API_KEY") {
+            alert("يا غالي لازم تحط الـ API Key بتاعك جوه الكود عشان الخاصية دي تشتغل.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image_file", file);
+        formData.append("size", "auto");
+
+        try {
+            const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+                method: "POST",
+                headers: { "X-Api-Key": apiKey },
+                body: formData
+            });
+            if (response.ok) {
+                const blob = await response.blob();
+                downloadBtn.href = URL.createObjectURL(blob);
+                downloadBtn.download = "no-bg.png";
+                downloadBtn.style.display = 'inline-block';
+            } else { alert("مشكلة في السيرفر أو انتهاء الكوتة المتاحة."); }
+        } catch (e) { alert("فشل الاتصال بالسيرفر!"); }
+    }
+
+    // --- كود أداة 3: إزالة العلامة المائية بالفرشاة اليدوية ---
+    let canvas = document.getElementById('wmCanvas');
+    let ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let originalImage = new Image();
+
+    function initWatermarkCanvas(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                originalImage.src = e.target.result;
+                originalImage.onload = function() {
+                    // ضبط أبعاد الـ Canvas لتناسب الصورة
+                    canvas.width = originalImage.width > 800 ? 800 : originalImage.width;
+                    canvas.height = (canvas.width / originalImage.width) * originalImage.height;
+                    
+                    ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+                    document.getElementById('canvasContainer').style.display = 'block';
+                    setupDrawing();
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function setupDrawing() {
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)'; // لون أحمر شفاف للفرشاة للتحديد
+        ctx.lineWidth = 20; // حجم الفرشاة
+        ctx.lineCap = 'round';
+
+        canvas.onmousedown = (e) => { isDrawing = true; ctx.beginPath(); draw(e); };
+        canvas.onmousemove = (e) => { if(isDrawing) draw(e); };
+        canvas.onmouseup = () => isDrawing = false;
+        
+        // دعم الموبايل واللمس
+        canvas.ontouchstart = (e) => { isDrawing = true; ctx.beginPath(); };
+        canvas.ontouchmove = (e) => { if(isDrawing) draw(e.touches[0]); };
+        canvas.ontouchend = () => isDrawing = false;
+    }
+
+    function draw(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.pageX) - rect.left;
+        const y = (e.clientY || e.pageY) - rect.top;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+
+    // عملية المسح البرمجية بالاعتماد على البكسلات المحيطة (Inpainting مبسط)
+    function processRemoveWatermark() {
+        const downloadBtn = document.getElementById('wmDownload');
+        
+        // خوارزمية ذكية سريعة: قراءة البكسلات الحمراء المحددة وتعويضها ببكسل مجاور سليم
+        let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let data = imgData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+            // إذا كان البكسل مائل للون الأحمر المختار للتحديد
+            if (data[i] > 200 && data[i+3] < 255) { 
+                // تعويض البكسل بالبكسل اللي قبله مباشرة (الخلفية)
+                data[i] = data[i - 4] || data[i];     // Red
+                data[i+1] = data[i - 3] || data[i+1]; // Green
+                data[i+2] = data[i - 2] || data[i+2]; // Blue
+                data[i+3] = 255;                      // Alpha كاملة
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+        // تجهيز زر التحميل
+        downloadBtn.href = canvas.toDataURL("image/jpeg");
+        downloadBtn.download = "clean_image.jpg";
+        downloadBtn.style.display = 'inline-block';
+    }
+</script>
+</body>
+</html>
